@@ -49,24 +49,43 @@
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
+    // Default content for the main page
     const defaultContent = "# Welcome to The Free Open Wiki\n\nThis is a simple, serverless Wikipedia-like system built with only HTML, JavaScript, and GitHub Pages!\n\nYou can edit this page or create new pages by modifying the URL and adding your own content.";
-    
+
     const contentDiv = document.getElementById('content');
     const editor = document.getElementById('editor');
     const saveButton = document.getElementById('saveButton');
     const editPageLink = document.getElementById('editPageLink');
     
-    function getHashContent() {
-      return decodeURIComponent(window.location.hash.substring(1));
+    // Helper function to safely decode Base64
+    function base64Decode(str) {
+      try {
+        return atob(str);
+      } catch (e) {
+        return '';
+      }
     }
 
-    function renderContent() {
-      let content = getHashContent();
-      if (!content) {
-        content = defaultContent;
+    // Helper function to encode a string to Base64
+    function base64Encode(str) {
+      return btoa(str);
+    }
+
+    // Get content from the hash (Base64 encoded)
+    function getHashContent() {
+      const hash = window.location.hash.substring(1); // Get the hash without '#'
+      if (hash) {
+        return base64Decode(hash);
+      } else {
+        return defaultContent;
       }
-      contentDiv.innerHTML = marked.parse(content);
-      editor.value = content;
+    }
+
+    // Render the Markdown content to the page
+    function renderContent() {
+      const content = getHashContent();
+      contentDiv.innerHTML = marked.parse(content); // Parse Markdown to HTML
+      editor.value = content; // Set the editor to the same content
     }
 
     // Toggle editor visibility
@@ -76,20 +95,20 @@
       saveButton.classList.toggle('hidden');
     });
 
-    // Save the edited content to URL
+    // Save the edited content to the URL (Base64 encoded)
     saveButton.addEventListener('click', () => {
       const newContent = editor.value;
-      window.location.hash = encodeURIComponent(newContent);
+      window.location.hash = base64Encode(newContent);
       renderContent();
       contentDiv.classList.remove('hidden');
       editor.classList.add('hidden');
       saveButton.classList.add('hidden');
     });
 
-    // Render content based on the hash
+    // Render content based on the URL hash when the page loads or hash changes
     window.addEventListener('hashchange', renderContent);
 
-    // Initial render
+    // Initial render when the page first loads
     renderContent();
   </script>
 
