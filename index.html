@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Free Open Wiki</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      margin: 20px 0;
+    }
+    .hidden {
+      display: none;
+    }
+    nav {
+      background-color: #f8f8f8;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 20px;
+    }
+    nav a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="javascript:void(0);" id="editPageLink">Edit Page</a>
+  </nav>
+
+  <h1 id="pageTitle">The Free Open Wiki</h1>
+  <div id="content"></div>
+  <textarea id="editor" class="hidden"></textarea>
+  <button id="saveButton" class="hidden">Save</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    const defaultContent = "# Welcome to The Free Open Wiki\n\nThis is a simple, serverless Wikipedia-like system built with only HTML, JavaScript, and GitHub Pages!\n\nYou can edit this page or create new pages by modifying the URL and adding your own content.";
+    
+    const contentDiv = document.getElementById('content');
+    const editor = document.getElementById('editor');
+    const saveButton = document.getElementById('saveButton');
+    const editPageLink = document.getElementById('editPageLink');
+    
+    function getHashContent() {
+      return decodeURIComponent(window.location.hash.substring(1));
+    }
+
+    function renderContent() {
+      let content = getHashContent();
+      if (!content) {
+        content = defaultContent;
+      }
+      contentDiv.innerHTML = marked.parse(content);
+      editor.value = content;
+    }
+
+    // Toggle editor visibility
+    editPageLink.addEventListener('click', () => {
+      contentDiv.classList.toggle('hidden');
+      editor.classList.toggle('hidden');
+      saveButton.classList.toggle('hidden');
+    });
+
+    // Save the edited content to URL
+    saveButton.addEventListener('click', () => {
+      const newContent = editor.value;
+      window.location.hash = encodeURIComponent(newContent);
+      renderContent();
+      contentDiv.classList.remove('hidden');
+      editor.classList.add('hidden');
+      saveButton.classList.add('hidden');
+    });
+
+    // Render content based on the hash
+    window.addEventListener('hashchange', renderContent);
+
+    // Initial render
+    renderContent();
+  </script>
+
+</body>
+</html>
